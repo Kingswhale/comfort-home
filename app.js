@@ -1,3 +1,16 @@
+const client = contentful.createClient({
+  // This is the space ID. A space is like a project folder in Contentful terms
+  space: '5iedh4ksjfvc',
+  // This is the access token for this space. Normally you get both ID and the token in the Contentful web app
+  accessToken: '60jxZAVwES5BuqZpRkpBd5Sb2u7l336J0FIkKCD67V8',
+})
+// This API call will request an entry with the specified ID from the space defined at the top, using a space-specific access token.
+// client
+//   .getEntry('5PeGS2SoZGSa4GuiQsigQu')
+//   .then((entry) => console.log(entry))
+//   .catch((err) => console.log(err))
+console.log(client)
+
 // variables
 
 const cartBtn = document.querySelector('.cart-btn')
@@ -19,9 +32,16 @@ let buttonsDOM = []
 class Products {
   async getProducts() {
     try {
-      let result = await fetch('products.json')
-      let data = await result.json()
-      let products = data.items
+      let contentful = await client.getEntries({
+        content_type: 'comfortHome',
+      })
+      console.log(contentful)
+      // let result = await fetch('products.json')
+      // let data = await result.json()
+      // let products = data.items
+
+      let products = contentful.items
+
       products = products.map((item) => {
         const { title, price } = item.fields
         const { id } = item.sys
@@ -49,7 +69,7 @@ class UI {
               class="product-img"
             />
             <button class="bag-btn" data-id="${product.id}">
-              <i class="fas fa-shopping-cart"></i>add to bag
+              <i class="fas fa-shopping-cart"></i>add to cart
             </button>
           </div>
           <h3>${product.title}</h3>
@@ -135,6 +155,69 @@ class UI {
     cartOverlay.classList.remove('transparentBcg')
     cartDOM.classList.remove('showCart')
   }
+  cartLogic() {
+    //clear cart button
+    clearCartBtn.addEventListener('click', () => {
+      this.clearCart()
+    })
+    // cart functionality
+    cartContent.addEventListener('click', (event) => {
+      console.log(event.target)
+      if (event.target.classList.contains('remove-item')) {
+        let removeItem = event.target
+        console.log(removeItem)
+        let id = removeItem.dataset.id
+        console.log(id)
+        cartContent.removeChild(removeItem.parentElement.parentElement)
+        this.removeItem(id)
+      } else if (event.target.classList.contains('fa-chevron-up')) {
+        let addAmount = event.target
+        console.log(addAmount)
+        let id = addAmount.dataset.id
+        console.log(id)
+        let tempItem = cart.find((item) => item.id === id)
+        tempItem.amount = tempItem.amount + 1
+        Storage.saveCart(cart)
+        this.setcartValue(cart)
+        addAmount.nextElementSibling.innerText = tempItem.amount
+      } else if (event.target.classList.contains('fa-chevron-down')) {
+        let lowerAmount = event.target
+        console.log(lowerAmount)
+        let id = lowerAmount.dataset.id
+        console.log(id)
+        let tempItem = cart.find((item) => item.id === id)
+        tempItem.amount = tempItem.amount - 1
+        if (tempItem.amount > 0) {
+          Storage.saveCart(cart)
+          this.setcartValue(cart)
+          lowerAmount.previousElementSibling.innerText = tempItem.amount
+        } else {
+          cartContent.removeChild(lowerAmount.parentElement.parentElement)
+          this.removeItem(id)
+        }
+      }
+    })
+  }
+  clearCart() {
+    let cartItems = cart.map((item) => item.id)
+    cartItems.forEach((id) => this.removeItem(id))
+    console.log(cartContent.children)
+    while (cartContent.children.length > 0) {
+      cartContent.removeChild(cartContent.children[0])
+    }
+    this.hideCart()
+  }
+  removeItem(id) {
+    cart = cart.filter((item) => item.id !== id)
+    this.setcartValue(cart)
+    Storage.saveCart(cart)
+    let button = this.getSingleButton(id)
+    button.disabled = false
+    button.innerHTML = `<i class="fas fa-shopping-cart"></i>add to cart`
+  }
+  getSingleButton(id) {
+    return buttonsDOM.find((button) => button.dataset.id === id)
+  }
 }
 
 //local storage
@@ -171,5 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .then(() => {
       ui.getBagButtons()
+      ui.cartLogic()
     })
 })
