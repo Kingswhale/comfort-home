@@ -1,5 +1,5 @@
-# comfort-home
-A simple javascript project
+
+ A simple javascript project
 ## comfort-home
 If a building or room is comfortable, it makes you feel physically relaxed when you spend time in it, for example because it is warm and has nice furniture.
 ## Comfort 
