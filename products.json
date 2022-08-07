@@ -12,7 +12,7 @@
       "sys": { "id": "2" },
       "fields": {
         "title": "king panel bed",
-        "price": 12.99,
+        "price": 15.99,
         "image": { "fields": { "file": { "url": "./images/product-2.jpeg" } } }
       }
     },
@@ -28,7 +28,7 @@
       "sys": { "id": "4" },
       "fields": {
         "title": "twin panel bed",
-        "price": 22.99,
+        "price": 52.99,
         "image": { "fields": { "file": { "url": "./images/product-4.jpeg" } } }
       }
     },
@@ -60,7 +60,7 @@
       "sys": { "id": "8" },
       "fields": {
         "title": "table",
-        "price": 33.99,
+        "price": 43.99,
         "image": { "fields": { "file": { "url": "./images/product-8.jpeg" } } }
       }
     }
